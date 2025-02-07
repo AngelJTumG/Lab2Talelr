@@ -2,6 +2,7 @@ import Pet from "../pet/pet.model.js";
 import Appointment from "../appointment/appointment.model.js";
 import { parse } from "date-fns";
 
+
 export const saveAppointment = async (req, res) => {
   try {
     const data = req.body;
@@ -56,3 +57,31 @@ export const saveAppointment = async (req, res) => {
     }); 
   }
 };
+
+export const listarCitas = async (req, res) => {
+  try{
+      const { uid } = req.params;
+      const { limite = 5, desde = 0 } = req.query
+      const query = { status: true }
+      query = {User: uid}
+ 
+      const [total, appointment ] = await Promise.all([
+          Appointment.countDocuments(query),
+          Appointment.find(query)
+              .skip(Number(desde))
+              .limit(Number(limite))
+      ])
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            
+      return res.status(200).json({
+          success: true,
+          total,
+          appointment
+      })
+  }catch(err){
+      return res.status(500).json({
+          success: false,
+          message: "Error al obtener las citas",
+          error: err.message
+      })
+  }
+}
